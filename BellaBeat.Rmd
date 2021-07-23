@@ -1,6 +1,6 @@
 ---
 title: "Untitled"
-output: github_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -66,6 +66,7 @@ Cited
 ## Process
 
 I am going to use Rstudio to analyze the data set. 
+
 
 
 ```{r}
