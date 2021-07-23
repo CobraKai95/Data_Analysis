@@ -1,0 +1,307 @@
+---
+title: "Untitled"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## GitHub Documents
+
+This is an R Markdown format used for publishing markdown documents to GitHub. When you click the **Knit** button all R code chunks are run and a markdown file (.md) suitable for publishing to GitHub is generated.
+
+
+# Introduction
+Bellabeat, a high-tech manufacturer of health-focused products for women. Bellabeat is a successful small company, but they have the potential to become a larger player in the global smart device market. 
+
+Urška Sršen, cofounder and Chief Creative Officer of Bellabeat, believes that analyzing smart device fitness data could help unlock new growth opportunities for the company. 
+
+# Ask
+__1. Sršen asks you to analyze smart device usage data in order to     gain insight into how consumers use non-Bellabeat smart devices.__     
+
+  + What are some trends in non-Bellabeat smart device usage?
+
+__2. She then wants you to select one Bellabeat product to apply these insights to in your presentation.__
+
+  + How could these trends apply to Bellabeat customers?
+  + How could these trends help influence Bellabeat marketing strategy?
+
+
+### Products
+
+* __Bellabeat app:__ The Bellabeat app provides users with health data related to their activity, sleep, stress,
+menstrual cycle, and mindfulness habits. This data can help users better understand their current habits and
+make healthy decisions. The Bellabeat app connects to their line of smart wellness products.
+
+* __Leaf:__ Bellabeat’s classic wellness tracker can be worn as a bracelet, necklace, or clip. The Leaf tracker connects
+to the Bellabeat app to track activity, sleep, and stress.
+
+* __Time:__ This wellness watch combines the timeless look of a classic timepiece with smart technology to track user
+activity, sleep, and stress. The Time watch connects to the Bellabeat app to provide you with insights into your
+daily wellness.
+
+* __Spring:__ This is a water bottle that tracks daily water intake using smart technology to ensure that you are
+appropriately hydrated throughout the day. The Spring bottle connects to the Bellabeat app to track your hydration levels.
+
+* __Bellabeat membership:__ Bellabeat also offers a subscription-based membership program for users. Membership gives users 24/7 access to fully personalized guidance on nutrition, activity, sleep, health and beauty, and mindfulness based on their lifestyle and goals.
+
+
+
+## Prepare 
+
+Sršen encourages you to use public data that explores smart device users’ daily habits. She points you to a specific data set:  
+[FitBit Fitness Tracker Data](https://www.kaggle.com/arashnic/fitbit)
+
+All data will be downloaded loacally 
+
+Reliable   
+Original  
+Comprehensive  
+Current  
+Cited  
+
+
+
+## Process
+
+I am going to use Rstudio to analyze the data set. 
+
+```{r cars}
+install.packages("tidyverse")
+install.packages("janitor")
+install.packages("lubridate")
+install.packages("ggpubr")
+```
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(lubridate)
+library(ggpubr)
+library(knitr)
+```
+
+
+```{r}
+#read csv files,clean column names
+daily_activity <- read_csv("~/Desktop/R-Data/dailyActivity_merged.csv")%>% 
+  clean_names()
+
+sleep <- read_csv("~/Desktop/R-Data/sleepDay_merged.csv") %>% 
+  clean_names()
+
+weight_log <- read_csv("~/Desktop/R-Data/weightLogInfo_merged.csv") %>% 
+  clean_names()
+
+hourly_calories <- read_csv("~/Desktop/R-Data/hourlyCalories_merged.csv") %>%
+  clean_names()
+  
+hourly_intensities <- read_csv("~/Desktop/R-Data/hourlyIntensities_merged.csv") %>% 
+  clean_names()
+
+hourly_steps <- read_csv("~/Desktop/R-Data/hourlySteps_merged.csv") %>% 
+  clean_names()
+```
+
+```{r}
+#view meta data on tables 
+str(daily_activity)
+str(sleep)
+str(weight_log)
+str(hourly_calories)
+str(hourly_intensities)
+str(hourly_steps)
+```
+
+##  After looking at the meta data, I see some format changes that need to be made and that some of these tables can be joined into two master tables: daily_activity & hourly_activity
+
+
+
+### daily_activty
+
+```{r}
+#transform daily_activity
+
+daily_activity <- daily_activity %>% 
+  mutate(activity_date = mdy(activity_date), day_week = weekdays(activity_date)) %>% 
+  rename(date = activity_date) %>% 
+  select(-logged_activities_distance,-very_active_distance,-moderately_active_distance,
+         -light_active_distance, -sedentary_active_distance)
+
+sleep <- sleep %>%
+  mutate(sleep_day = mdy_hms(sleep_day)) %>% 
+  rename(date = sleep_day )
+
+weight_log <- weight_log %>% 
+  mutate(date = mdy_hms(date)) %>% 
+  separate(date, into=c("date", "time"), sep = " ") %>% 
+  select(-time,-weight_kg, -is_manual_report,-log_id)
+```
+### hourly_activity 
+```{r}
+hourly_calories <- hourly_calories %>% 
+  mutate(date = mdy_hms(activity_hour)) %>% 
+  separate(date, into = c("date", "time"), sep = " ") %>% 
+  select(-activity_hour)
+ 
+hourly_intensities <- hourly_intensities %>% 
+  mutate(date = mdy_hms(activity_hour)) %>% 
+  separate(date, into=c("date","time"), sep = " ") %>% 
+  select(-activity_hour)
+
+hourly_steps <- hourly_steps %>% 
+  mutate(date = mdy_hms(activity_hour)) %>% 
+  separate(date, into=c("date","time"), sep = " ") %>% 
+  select(-activity_hour)
+```
+
+### Now that we have transformed the data into a better format I would like to scan the meta again to make sure the dates were parsed and the columns are correct
+```{r}
+glimpse(daily_activity)
+glimpse(sleep)
+glimpse(weight_log)
+glimpse(hourly_calories)
+glimpse(hourly_intensities)
+glimpse(hourly_steps)
+```
+
+### Now lets check how many participants made observations.
+
+# Analyze
+```{r}
+## see how many distinct
+n_distinct(daily_activity$id)
+n_distinct(sleep$id)
+n_distinct(weight_log$id)
+n_distinct(hourly_calories$id)
+n_distinct(hourly_intensities$id)
+n_distinct(hourly_steps$id)
+```
+### Here we can see that weight_log only has 8 participants and sleep with 24. I will throw these out to just focus on the daily and hourly motion activity. 
+
+```{r}
+## now lets merge these tables into one because I can see that these will merge greatly on "id" & "date"
+
+
+daily_activity<- full_join(daily_activity,sleep,by = c("id"="id","date" = "date"))
+
+## merge hourly_calories & hourly_steps
+hourly_activity <- full_join(hourly_calories,hourly_steps, by = c("id"="id","date"="date","time"="time") )
+
+##merge all three into hourly_activity
+hourly_activity <- full_join(hourly_activity,hourly_intensities, by=c("id"="id","date"="date","time"="time"))
+```
+## Daily & Hourly Activty 
+
+```{r}
+daily_activity %>% 
+  summary()
+
+hourly_activity %>% 
+  summary()
+```
+
+
+
+```{r}
+# Total Steps
+ggplot(daily_activity,aes(x = date, y = total_steps))+
+  geom_jitter() +
+  theme_bw()
+# Total Distance
+ggplot(daily_activity,aes(x = date, y = total_distance))+
+  geom_jitter() +
+  theme_bw()
+# Calories Burned
+ggplot(daily_activity,aes(x = date, y = calories))+
+  geom_jitter() +
+  theme_bw()
+```
+#### 7652 Average steps per day  
+#### 5.503 miles Avergage distance per day 
+#### 2308 Average calories burned per day 
+
+### Now lets show the average intensity of the users
+
+```{r}
+avg_activity_minutes <- c(21.21,13.36,193,990.4) 
+intensity <- c("very_active","fairly_active","lightly_active","sedentary")
+intensity_min <- data.frame(intensity,avg_activity_minutes)
+
+
+ggplot(intensity_min) +
+  geom_col(aes(x = intensity, y = avg_activity_minutes), fill ='blue')+
+  theme_bw()
+```
+* Here we can see that most of the observations were @ Sedentary movement
+
+#### There is a positive correlation between steps taken and calories burned.
+
+```{r}
+ggplot(daily_activity)+
+  geom_smooth(aes(total_steps,calories))+
+  theme_bw()
+```
+#### There is a positive correlation between distance traveled and calories burned.
+
+```{r}
+ggplot(daily_activity, aes(x = total_distance, y = calories)) +
+    geom_smooth()
+```
+#### The most Positive Corelation is with average intentisty & calories burned
+
+```{r}
+ggplot(hourly_activity, aes(x = average_intensity, y = calories)) +
+    geom_smooth()
+```
+## Hourly Activity
+
+
+
+```{r}
+ggplot(hourly_activity)+
+  geom_col(aes(x = time, y = calories), fill = 'blue')+
+  theme(axis.text.x = element_text(size = 10, angle = 45, hjust = 1))+
+  labs(title = 'Calories Burned By Hour')
+```
+```{r}
+ggplot(hourly_activity)+
+  geom_col(aes(x = time, y = step_total), fill = 'blue')+
+  theme(axis.text.x = element_text(size = 10, angle = 45, hjust = 1))+
+  labs(title = 'Steps Taken Per Hour')
+```
+```{r}
+ggplot(hourly_activity)+
+  geom_col(aes(x = time, y = average_intensity), fill = 'blue')+
+  theme(axis.text.x = element_text(size = 10, angle = 45, hjust = 1))+
+  labs(title = 'Average Intensity By Hour')
+```
+## After revieiweing the column charts we can see that the participants are most active at 12:00 and between 17:00 - 20:00.
+## Lets foucs 
+What are some trends in smart device usage?
+
+* Participant observations on non bella beat products were not consistent. 
+  - 33 people recorded movement activity 
+  - 24 people recorded sleep 
+  - 8 people recorded weight
+  
+I would recommend that bella beat make its products more comfortable to sleep with and use that in your marketing campaign to set a standard for comfortable sleeping with bella beat. Also a new way of recording weight automatically with out having to enter manualy 
+
+* There was a trend with movement activity between the participants. 
+  - Most activity of the users were less active with a small amount of very active participants. 
+  - Highest activity was done at 12:00 and between the hours of 17:00 - 20:00.
+  - Strongest correlation between intensity and calories burned 
+  
+I would recommend that bella beat use notification to get their users more motivated in the morning to move and to promote intensity. 
+
+
+how could these trends help influence Bellabeat marketring strategy?
+
+
+* I would market motivation to the participants to get more active. Also to make the UI dashboard great for them to track their activity. 
+
+
+
+# .
+
