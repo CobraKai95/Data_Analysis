@@ -604,7 +604,7 @@ ggplot(daily_activity,aes(x = date, y = total_steps))+
   theme_bw()
 ```
 
-![](BellaBeat_DataAnalysis_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](BellaBeat_Analysis_v1_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ``` r
 # Total Distance
@@ -613,7 +613,7 @@ ggplot(daily_activity,aes(x = date, y = total_distance))+
   theme_bw()
 ```
 
-![](BellaBeat_DataAnalysis_files/figure-gfm/unnamed-chunk-10-2.png)<!-- -->
+![](BellaBeat_Analysis_v1_files/figure-gfm/unnamed-chunk-10-2.png)<!-- -->
 
 ``` r
 # Calories Burned
@@ -622,7 +622,7 @@ ggplot(daily_activity,aes(x = date, y = calories))+
   theme_bw()
 ```
 
-![](BellaBeat_DataAnalysis_files/figure-gfm/unnamed-chunk-10-3.png)<!-- -->
+![](BellaBeat_Analysis_v1_files/figure-gfm/unnamed-chunk-10-3.png)<!-- -->
 \#\#\#\# 7652 Average steps per day  
 \#\#\#\# 5.503 miles Avergage distance per day \#\#\#\# 2308 Average
 calories burned per day
@@ -640,7 +640,7 @@ ggplot(intensity_min) +
   theme_bw()
 ```
 
-![](BellaBeat_DataAnalysis_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](BellaBeat_Analysis_v1_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 \* Here we can see that most of the observations were @ Sedentary
 movement
 
@@ -654,7 +654,7 @@ ggplot(daily_activity)+
 
     ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
-![](BellaBeat_DataAnalysis_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](BellaBeat_Analysis_v1_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 \#\#\#\# There is a positive correlation between distance traveled and
 calories burned.
 
@@ -665,7 +665,7 @@ ggplot(daily_activity, aes(x = total_distance, y = calories)) +
 
     ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
-![](BellaBeat_DataAnalysis_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](BellaBeat_Analysis_v1_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 \#\#\#\# The most Positive Corelation is with average intentisty &
 calories burned
 
@@ -676,7 +676,7 @@ ggplot(hourly_activity, aes(x = average_intensity, y = calories)) +
 
     ## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
 
-![](BellaBeat_DataAnalysis_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](BellaBeat_Analysis_v1_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 \#\# Hourly Activity
 
 ``` r
@@ -686,7 +686,7 @@ ggplot(hourly_activity)+
   labs(title = 'Calories Burned By Hour')
 ```
 
-![](BellaBeat_DataAnalysis_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](BellaBeat_Analysis_v1_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 ``` r
 ggplot(hourly_activity)+
@@ -695,7 +695,7 @@ ggplot(hourly_activity)+
   labs(title = 'Steps Taken Per Hour')
 ```
 
-![](BellaBeat_DataAnalysis_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](BellaBeat_Analysis_v1_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 ``` r
 ggplot(hourly_activity)+
@@ -704,7 +704,7 @@ ggplot(hourly_activity)+
   labs(title = 'Average Intensity By Hour')
 ```
 
-![](BellaBeat_DataAnalysis_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](BellaBeat_Analysis_v1_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 \#\# After revieiweing the column charts we can see that the
 participants are most active at 12:00 and between 17:00 - 20:00. \#\#
 Lets foucs What are some trends in smart device usage?
